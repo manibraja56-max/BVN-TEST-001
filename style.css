@@ -1,147 +1,262 @@
 /* ==========================================
-   BVN SMART ENGINE V1
-   ENG-003.5
+BVN SMART ENGINE V1
+ENG-004.1
+LAYER SEPARATION + Z-AXIS DEPTH
+Includes ENG-003.6 Touch / Drag Rotation
 ========================================== */
 
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
+
+/* ==========================================
+GLOBAL
+========================================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-body{
-    width:100vw;
-    height:100vh;
-    overflow:hidden;
-
-    background:#121a24;
-
-    display:flex;
-    justify-content:center;
-    align-items:center;
-
-    font-family:Arial, Helvetica, sans-serif;
+html,
+body {
+    width: 100%;
+    height: 100%;
 }
 
-/* CAMERA */
+body {
+    width: 100vw;
+    height: 100vh;
 
-#camera{
-    width:100%;
-    height:100%;
+    overflow: hidden;
 
-    overflow:hidden;
+    background: #121a24;
 
-    position:relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    font-family: Arial, Helvetica, sans-serif;
 }
 
-/* SCENE */
 
-.scene{
-    position:absolute;
+/* ==========================================
+LAYER 1 — CAMERA
+========================================== */
 
-    left:50%;
-    top:50%;
+#camera {
+    width: 100%;
+    height: 100%;
 
-    transform:translate(-50%,-50%);
+    overflow: hidden;
+
+    position: relative;
+
+    perspective: 1000px;
+    perspective-origin: center center;
 }
 
-/* CENTER */
 
-.center-circle{
+/* ==========================================
+LAYER 2 — 3D SCENE
+========================================== */
 
-    position:absolute;
+.scene {
+    position: absolute;
 
-    width:180px;
-    height:180px;
+    left: 50%;
+    top: 50%;
 
-    left:50%;
-    top:50%;
+    width: 1px;
+    height: 1px;
 
-    margin-left:-90px;
-    margin-top:-90px;
+    transform-style: preserve-3d;
 
-    border-radius:50%;
-    overflow:hidden;
+    transform:
+        translate(-50%, -50%)
+        rotateX(0deg)
+        rotateY(0deg);
 
-    border:4px solid #2ecc71;
-
-    background:#1d2734;
-
-    box-shadow:0 0 40px rgba(46,204,113,.35);
-
-    z-index:100;
+    transform-origin: center center;
 }
 
-/* IMAGE */
 
-#niththu{
+/* ==========================================
+LAYER 3 — CENTER / NITHTHU
+========================================== */
 
-    width:100%;
-    height:100%;
+.center-circle {
+    position: absolute;
 
-    object-fit:cover;
+    width: 180px;
+    height: 180px;
 
-    user-select:none;
+    left: 50%;
+    top: 50%;
 
-    pointer-events:none;
+    margin-left: -90px;
+    margin-top: -90px;
+
+    border-radius: 50%;
+
+    overflow: hidden;
+
+    border: 4px solid #2ecc71;
+
+    background: #1d2734;
+
+    box-shadow:
+        0 0 40px rgba(46, 204, 113, .35);
+
+    transform:
+        translateZ(0px);
+
+    transform-style: preserve-3d;
+
+    z-index: 100;
 }
 
-/* ORBITS */
 
-.orbit{
+/* ==========================================
+NITHTHU IMAGE
+========================================== */
 
-    position:absolute;
+#niththu {
+    width: 100%;
+    height: 100%;
 
-    left:50%;
-    top:50%;
+    object-fit: cover;
 
-    transform:translate(-50%,-50%);
+    user-select: none;
 
-    border-radius:50%;
+    pointer-events: none;
 
-    border:2px dashed rgba(255,255,255,.15);
+    display: block;
 }
 
-/* PLANETS */
 
-.planet{
+/* ==========================================
+LAYER 4 — ORBIT SYSTEM
+========================================== */
 
-    position:absolute;
+#orbit-container {
+    position: absolute;
 
-    border-radius:50%;
+    left: 0;
+    top: 0;
 
-    cursor:pointer;
+    width: 1px;
+    height: 1px;
 
-    transition:.25s;
+    transform-style: preserve-3d;
+
+    pointer-events: none;
+
+    z-index: 50;
 }
 
-.planet:hover{
 
-    transform:scale(1.15);
+/* ==========================================
+ORBIT
+========================================== */
 
-    box-shadow:0 0 22px rgba(255,255,255,.8);
+.orbit {
+    position: absolute;
+
+    left: 50%;
+    top: 50%;
+
+    transform:
+        translate(-50%, -50%);
+
+    border-radius: 50%;
+
+    border: 2px dashed rgba(255, 255, 255, .15);
+
+    transform-style: preserve-3d;
+
+    pointer-events: none;
 }
 
-.planet.selected{
 
-    outline:3px solid white;
+/* ==========================================
+LAYER 5 — PLANETS
+========================================== */
 
-    transform:scale(1.2);
+.planet {
+    position: absolute;
 
-    box-shadow:0 0 30px rgba(255,255,255,.95);
+    border-radius: 50%;
+
+    cursor: pointer;
+
+    transition:
+        transform .25s,
+        box-shadow .25s;
+
+    transform-style: preserve-3d;
+
+    pointer-events: auto;
 }
 
-/* MOBILE */
 
-@media(max-width:768px){
+/* ==========================================
+PLANET HOVER
+========================================== */
 
-    .center-circle{
+.planet:hover {
+    transform:
+        scale(1.15)
+        translateZ(15px);
 
-        width:130px;
-        height:130px;
+    box-shadow:
+        0 0 22px rgba(255, 255, 255, .8);
+}
 
-        margin-left:-65px;
-        margin-top:-65px;
+
+/* ==========================================
+PLANET SELECTED
+========================================== */
+
+.planet.selected {
+    outline: 3px solid white;
+
+    transform:
+        scale(1.2)
+        translateZ(25px);
+
+    box-shadow:
+        0 0 30px rgba(255, 255, 255, .95);
+
+    z-index: 200;
+}
+
+
+/* ==========================================
+Z-AXIS DEPTH LAYERS
+========================================== */
+
+.scene,
+.orbit,
+.planet,
+.center-circle {
+    backface-visibility: visible;
+}
+
+
+/* ==========================================
+MOBILE
+========================================== */
+
+@media (max-width: 768px) {
+
+    .center-circle {
+        width: 130px;
+        height: 130px;
+
+        margin-left: -65px;
+        margin-top: -65px;
     }
 
+    #camera {
+        perspective: 800px;
+    }
 }
