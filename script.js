@@ -1,11 +1,25 @@
 /* =====================================
    BVN SMART ENGINE V1
-   ENG-003.6
-   Touch / Drag Rotation
+   ENG-003.7
+   Z-Axis / Depth
+   Includes ENG-003.6 Touch / Drag Rotation
    Includes ENG-003.5 Camera Follow
 ===================================== */
 
 const scene = document.querySelector(".scene");
+
+
+/* =====================================
+   3D SPACE
+===================================== */
+
+scene.style.touchAction = "none";
+scene.style.transformStyle = "preserve-3d";
+
+if (scene.parentElement) {
+    scene.parentElement.style.perspective = "900px";
+    scene.parentElement.style.transformStyle = "preserve-3d";
+}
 
 
 /* =====================================
@@ -20,8 +34,10 @@ const camera = {
     targetX: 0,
     targetY: 0,
 
-    smooth: 0.08
+    depth: 0,
+    targetDepth: 0,
 
+    smooth: 0.08
 };
 
 
@@ -45,37 +61,147 @@ let userRotationX = 0;
 let userRotationY = 0;
 
 
-/* Prevent browser scrolling while dragging scene */
+/* =====================================
+   Z-AXIS DEPTH
+===================================== */
 
-scene.style.touchAction = "none";
+let userDepth = 0;
+
+const MIN_DEPTH = -350;
+const MAX_DEPTH = 350;
 
 
-/* Pointer Down */
+/* =====================================
+   POINTER TRACKING
+===================================== */
+
+const activePointers = new Map();
+
+let pinchStartDistance = null;
+let pinchStartDepth = 0;
+
+
+/* =====================================
+   POINTER DOWN
+===================================== */
 
 scene.addEventListener("pointerdown", (e) => {
 
-    isDragging = true;
-
-    lastX = e.clientX;
-    lastY = e.clientY;
+    activePointers.set(e.pointerId, {
+        x: e.clientX,
+        y: e.clientY
+    });
 
     scene.setPointerCapture(e.pointerId);
 
+
+    /* Single finger / mouse */
+
+    if (activePointers.size === 1) {
+
+        isDragging = true;
+
+        lastX = e.clientX;
+        lastY = e.clientY;
+
+    }
+
+
+    /* Two finger pinch */
+
+    if (activePointers.size === 2) {
+
+        isDragging = false;
+
+        const points = [...activePointers.values()];
+
+        const dx = points[0].x - points[1].x;
+        const dy = points[0].y - points[1].y;
+
+        pinchStartDistance =
+            Math.sqrt(dx * dx + dy * dy);
+
+        pinchStartDepth = userDepth;
+    }
+
 });
 
 
-/* Pointer Move */
+/* =====================================
+   POINTER MOVE
+===================================== */
 
 scene.addEventListener("pointermove", (e) => {
 
-    if (!isDragging) return;
+    if (!activePointers.has(e.pointerId)) {
+        return;
+    }
 
-    const dx = e.clientX - lastX;
-    const dy = e.clientY - lastY;
 
-    userRotationY += dx * 0.35;
+    activePointers.set(e.pointerId, {
+        x: e.clientX,
+        y: e.clientY
+    });
 
-    userRotationX -= dy * 0.15;
+
+    /* =================================
+       TWO FINGER DEPTH CONTROL
+    ================================= */
+
+    if (activePointers.size === 2) {
+
+        const points = [...activePointers.values()];
+
+        const dx =
+            points[0].x - points[1].x;
+
+        const dy =
+            points[0].y - points[1].y;
+
+        const currentDistance =
+            Math.sqrt(dx * dx + dy * dy);
+
+
+        if (pinchStartDistance !== null) {
+
+            const difference =
+                currentDistance - pinchStartDistance;
+
+            userDepth =
+                pinchStartDepth + difference * 1.2;
+
+            userDepth =
+                Math.max(
+                    MIN_DEPTH,
+                    Math.min(MAX_DEPTH, userDepth)
+                );
+        }
+
+        return;
+    }
+
+
+    /* =================================
+       SINGLE FINGER ROTATION
+    ================================= */
+
+    if (!isDragging) {
+        return;
+    }
+
+    const dx =
+        e.clientX - lastX;
+
+    const dy =
+        e.clientY - lastY;
+
+
+    userRotationY +=
+        dx * 0.35;
+
+    userRotationX -=
+        dy * 0.15;
+
 
     lastX = e.clientX;
     lastY = e.clientY;
@@ -83,22 +209,32 @@ scene.addEventListener("pointermove", (e) => {
 });
 
 
-/* Pointer Up */
+/* =====================================
+   POINTER UP
+===================================== */
 
 scene.addEventListener("pointerup", (e) => {
 
+    activePointers.delete(e.pointerId);
+
     isDragging = false;
 
-    scene.releasePointerCapture(e.pointerId);
+    pinchStartDistance = null;
 
 });
 
 
-/* Pointer Cancel */
+/* =====================================
+   POINTER CANCEL
+===================================== */
 
-scene.addEventListener("pointercancel", () => {
+scene.addEventListener("pointercancel", (e) => {
+
+    activePointers.delete(e.pointerId);
 
     isDragging = false;
+
+    pinchStartDistance = null;
 
 });
 
@@ -110,31 +246,21 @@ scene.addEventListener("pointercancel", () => {
 const orbitData = [
 
     {
-
         radius: 450,
-
         planetSize: 60,
-
         color: "#3b82f6",
-
         speed: 0.4,
-
-        angle: 0
-
+        angle: 0,
+        depth: 0
     },
 
     {
-
         radius: 300,
-
         planetSize: 45,
-
         color: "#f59e0b",
-
         speed: -0.8,
-
-        angle: 180
-
+        angle: 180,
+        depth: 0
     }
 
 ];
@@ -147,23 +273,32 @@ const orbits = [];
    CREATE ORBITS
 ===================================== */
 
-orbitData.forEach((data, index) => {
+orbitData.forEach((data) => {
 
-    const orbit = document.createElement("div");
+    const orbit =
+        document.createElement("div");
 
     orbit.className = "orbit";
 
 
     /* Orbit Size */
 
-    orbit.style.width = data.radius + "px";
+    orbit.style.width =
+        data.radius + "px";
 
-    orbit.style.height = data.radius + "px";
+    orbit.style.height =
+        data.radius + "px";
+
+    orbit.style.transformStyle =
+        "preserve-3d";
 
 
-    /* Planet */
+    /* =================================
+       PLANET
+    ================================= */
 
-    const planet = document.createElement("div");
+    const planet =
+        document.createElement("div");
 
     planet.className = "planet";
 
@@ -177,30 +312,40 @@ orbitData.forEach((data, index) => {
     planet.style.background =
         data.color;
 
+    planet.style.transformStyle =
+        "preserve-3d";
 
-    /* Add Planet to Orbit */
+
+    /* Add Planet */
 
     orbit.appendChild(planet);
 
     scene.appendChild(orbit);
 
 
-    /* Orbit Object */
+    /* =================================
+       ORBIT OBJECT
+    ================================= */
 
     const obj = {
 
         orbit,
-
         planet,
 
-        radius: data.radius,
+        radius:
+            data.radius,
 
-        planetSize: data.planetSize,
+        planetSize:
+            data.planetSize,
 
-        angle: data.angle,
+        angle:
+            data.angle,
 
-        speed: data.speed
+        speed:
+            data.speed,
 
+        depth:
+            data.depth
     };
 
 
@@ -221,13 +366,10 @@ orbitData.forEach((data, index) => {
 
         planet.classList.add("selected");
 
-
         selectedPlanet = obj;
 
     });
 
-
-    /* Store Orbit */
 
     orbits.push(obj);
 
@@ -247,30 +389,34 @@ function animate() {
 
     orbits.forEach(obj => {
 
-
-        /* Automatic orbit */
-
         obj.angle += obj.speed;
 
 
-        /* Rotate orbit */
+        /* Orbit rotation */
 
         obj.orbit.style.transform =
             `translate(-50%, -50%)
              rotate(${obj.angle}deg)`;
 
 
-        /* Planet Position */
+        /* Planet position */
 
         obj.planet.style.left =
             (obj.radius / 2)
             - (obj.planetSize / 2)
             + "px";
 
-
         obj.planet.style.top =
             (-obj.planetSize / 2)
             + "px";
+
+
+        /* =================================
+           PLANET Z-AXIS
+        ================================= */
+
+        obj.planet.style.transform =
+            `translateZ(${obj.depth}px)`;
 
     });
 
@@ -280,7 +426,6 @@ function animate() {
     ================================= */
 
     if (selectedPlanet) {
-
 
         const rad =
             selectedPlanet.angle
@@ -302,14 +447,15 @@ function animate() {
             * distance;
 
 
-        camera.targetX = -x;
+        camera.targetX =
+            -x;
 
-        camera.targetY = -y;
+        camera.targetY =
+            -y;
 
     }
 
     else {
-
 
         camera.targetX = 0;
 
@@ -326,28 +472,41 @@ function animate() {
         (camera.targetX - camera.x)
         * camera.smooth;
 
-
     camera.y +=
         (camera.targetY - camera.y)
         * camera.smooth;
 
 
     /* =================================
-       FINAL SCENE TRANSFORM
-       Camera + Touch Rotation
+       DEPTH SMOOTHING
+    ================================= */
+
+    camera.targetDepth =
+        userDepth;
+
+    camera.depth +=
+        (camera.targetDepth - camera.depth)
+        * 0.12;
+
+
+    /* =================================
+       FINAL 3D TRANSFORM
     ================================= */
 
     scene.style.transform =
 
-        `translate(
+        `translate3d(
             calc(-50% + ${camera.x}px),
-            calc(-50% + ${camera.y}px)
+            calc(-50% + ${camera.y}px),
+            ${camera.depth}px
         )
         rotateX(${userRotationX}deg)
         rotateY(${userRotationY}deg)`;
 
 
-    /* Next Frame */
+    /* =================================
+       NEXT FRAME
+    ================================= */
 
     requestAnimationFrame(animate);
 
