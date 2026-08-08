@@ -2,43 +2,146 @@
 <html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
     <title>BVN SMART ENGINE V1</title>
 
-    <link rel="stylesheet" href="style.css">
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+
 </head>
+
 
 <body>
 
-    <!-- CAMERA -->
+    <!-- =====================================
+         CAMERA
+    ====================================== -->
+
     <div id="camera">
 
-        <!-- SCENE -->
+
+        <!-- =================================
+             3D SCENE
+        ================================== -->
+
         <div class="scene">
 
-            <!-- NITHTHU CENTER -->
-            <div class="center-circle">
 
-                <img
-                    id="niththu"
-                    src="niththu.png"
-                    alt="NITHTHU">
+            <!-- =================================
+                 LAYER 01 — BACKGROUND
+            ================================== -->
+
+            <div
+                id="layer-background"
+                class="scene-layer layer-background"
+            >
+            </div>
+
+
+            <!-- =================================
+                 LAYER 02 — OUTER ORBIT
+                 Blue Planet
+            ================================== -->
+
+            <div
+                id="layer-outer-orbit"
+                class="scene-layer layer-orbit layer-outer-orbit"
+            >
+            </div>
+
+
+            <!-- =================================
+                 LAYER 03 — INNER ORBIT
+                 Orange Planet
+            ================================== -->
+
+            <div
+                id="layer-inner-orbit"
+                class="scene-layer layer-orbit layer-inner-orbit"
+            >
+            </div>
+
+
+            <!-- =================================
+                 LAYER 04 — CENTER OBJECT
+                 NITHTHU
+            ================================== -->
+
+            <div
+                id="layer-center"
+                class="scene-layer layer-center"
+            >
+
+                <div class="center-circle">
+
+                    <img
+                        id="niththu"
+                        src="niththu.png"
+                        alt="NITHTHU"
+                    >
+
+                </div>
 
             </div>
 
-            <!--
-                Dynamic Orbits
-                Created by script.js
-            -->
-            <div id="orbit-container"></div>
+
+            <!-- =================================
+                 LAYER 05 — INTERACTION
+                 Selection / Highlight
+            ================================== -->
+
+            <div
+                id="layer-interaction"
+                class="scene-layer layer-interaction"
+            >
+            </div>
+
+
+            <!-- =================================
+                 LAYER 06 — UI OVERLAY
+                 Labels / Controls
+            ================================== -->
+
+            <div
+                id="layer-ui"
+                class="scene-layer layer-ui"
+            >
+            </div>
+
+
+            <!-- =================================
+                 DYNAMIC ORBIT CONTAINER
+
+                 Temporary compatibility layer.
+                 script.js will be connected to
+                 the separated orbit layers later.
+            ================================== -->
+
+            <div
+                id="orbit-container"
+                class="orbit-container"
+            >
+            </div>
+
 
         </div>
 
     </div>
 
-    <!-- ENGINE -->
+
+    <!-- =====================================
+         ENGINE
+    ====================================== -->
+
     <script src="script.js"></script>
 
 </body>
