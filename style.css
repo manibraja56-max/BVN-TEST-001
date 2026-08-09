@@ -1,15 +1,19 @@
 /* ==========================================
    BVN SMART ENGINE V1
-   ENG-004.2
-   INDEPENDENT LAYER DEPTH
-   Includes ENG-004.1 Layer Separation
-   Includes ENG-003.6 Touch / Drag Rotation
-========================================== */
+   ENG-004.3
+   DEPTH INTERACTION / LAYER PRIORITY
+
+   Includes:
+   ENG-003.5 Base Engine
+   ENG-003.6 Touch / Drag Rotation
+   ENG-004.1 Layer Separation + Z-Axis Depth
+   ENG-004.2 Independent Layer Depth
+   ========================================== */
 
 
 /* ==========================================
    GLOBAL
-========================================== */
+   ========================================== */
 
 * {
     margin: 0;
@@ -41,7 +45,7 @@ body {
 
 /* ==========================================
    LAYER 1 — CAMERA
-========================================== */
+   ========================================== */
 
 #camera {
     width: 100%;
@@ -58,7 +62,7 @@ body {
 
 /* ==========================================
    LAYER 2 — 3D SCENE
-========================================== */
+   ========================================== */
 
 .scene {
     position: absolute;
@@ -82,8 +86,7 @@ body {
 
 /* ==========================================
    LAYER 3 — CENTER / NITHTHU
-   DEPTH = +30px
-========================================== */
+   ========================================== */
 
 .center-circle {
     position: absolute;
@@ -109,20 +112,28 @@ body {
         0 0 40px rgba(46, 204, 113, .35);
 
     /*
-       Independent Z depth
-       NITHTHU stays in front of orbit
+       Base center depth
     */
-    translate: 0 0 30px;
+    transform:
+        translateZ(0px);
 
     transform-style: preserve-3d;
 
+    /*
+       Center layer priority
+    */
     z-index: 100;
+
+    /*
+       Independent depth
+    */
+    --layer-depth: 0px;
 }
 
 
 /* ==========================================
    NITHTHU IMAGE
-========================================== */
+   ========================================== */
 
 #niththu {
     width: 100%;
@@ -140,8 +151,7 @@ body {
 
 /* ==========================================
    LAYER 4 — ORBIT SYSTEM
-   DEPTH = -20px
-========================================== */
+   ========================================== */
 
 #orbit-container {
     position: absolute;
@@ -157,17 +167,21 @@ body {
     pointer-events: none;
 
     /*
-       Orbit system sits behind NITHTHU
+       Orbit remains behind NITHTHU
     */
-    translate: 0 0 -20px;
-
     z-index: 50;
+
+    /*
+       Independent orbit depth
+    */
+    transform:
+        translateZ(-10px);
 }
 
 
 /* ==========================================
    ORBIT
-========================================== */
+   ========================================== */
 
 .orbit {
     position: absolute;
@@ -175,14 +189,9 @@ body {
     left: 50%;
     top: 50%;
 
-    /*
-       ENG-004.2
-       Independent orbit depth
-    */
-    translate: 0 0 -20px;
-
     transform:
-        translate(-50%, -50%);
+        translate(-50%, -50%)
+        translateZ(0px);
 
     border-radius: 50%;
 
@@ -192,14 +201,16 @@ body {
 
     pointer-events: none;
 
-    backface-visibility: visible;
+    /*
+       Orbit depth baseline
+    */
+    --orbit-depth: 0px;
 }
 
 
 /* ==========================================
    LAYER 5 — PLANETS
-   DEPTH = +10px
-========================================== */
+   ========================================== */
 
 .planet {
     position: absolute;
@@ -208,98 +219,255 @@ body {
 
     cursor: pointer;
 
-    /*
-       Independent planet depth
-    */
-    translate: 0 0 10px;
-
     transition:
-        transform .25s,
-        box-shadow .25s;
+        transform .25s ease,
+        box-shadow .25s ease,
+        filter .25s ease;
 
     transform-style: preserve-3d;
 
     pointer-events: auto;
 
-    backface-visibility: visible;
+    /*
+       Every planet owns its own depth
+    */
+    --planet-depth: 0px;
+
+    /*
+       Default planet priority
+    */
+    z-index: 120;
+}
+
+
+/* ==========================================
+   PLANET DEPTH LEVELS
+   ========================================== */
+
+/*
+   Background planet
+*/
+.planet.depth-back {
+    --planet-depth: -35px;
+
+    z-index: 110;
+
+    transform:
+        translateZ(var(--planet-depth));
+}
+
+
+/*
+   Normal planet
+*/
+.planet.depth-normal {
+    --planet-depth: 0px;
+
+    z-index: 120;
+
+    transform:
+        translateZ(var(--planet-depth));
+}
+
+
+/*
+   Foreground planet
+*/
+.planet.depth-front {
+    --planet-depth: 35px;
+
+    z-index: 130;
+
+    transform:
+        translateZ(var(--planet-depth));
+}
+
+
+/*
+   Deep foreground
+*/
+.planet.depth-front-max {
+    --planet-depth: 60px;
+
+    z-index: 140;
+
+    transform:
+        translateZ(var(--planet-depth));
 }
 
 
 /* ==========================================
    PLANET HOVER
-   DEPTH = +15px additional
-========================================== */
+   ========================================== */
 
 .planet:hover {
     transform:
+        translateZ(
+            calc(var(--planet-depth) + 15px)
+        )
         scale(1.15);
-
-    /*
-       Hover depth
-    */
-    translate: 0 0 25px;
 
     box-shadow:
         0 0 22px rgba(255, 255, 255, .8);
+
+    filter:
+        brightness(1.08);
 }
 
 
 /* ==========================================
    PLANET SELECTED
-   DEPTH = +50px
-========================================== */
+   ========================================== */
 
 .planet.selected {
     outline: 3px solid white;
 
-    /*
-       Selected planet comes clearly forward
-    */
-    translate: 0 0 50px;
-
     transform:
+        translateZ(
+            calc(var(--planet-depth) + 25px)
+        )
         scale(1.2);
 
     box-shadow:
         0 0 30px rgba(255, 255, 255, .95);
 
+    /*
+       Selected object always comes forward
+    */
+    z-index: 200;
+
+    filter:
+        brightness(1.12);
+}
+
+
+/* ==========================================
+   SELECTED + FRONT PRIORITY
+   ========================================== */
+
+.planet.depth-front.selected,
+.planet.depth-front-max.selected {
+    z-index: 220;
+
+    transform:
+        translateZ(
+            calc(var(--planet-depth) + 30px)
+        )
+        scale(1.2);
+
+    box-shadow:
+        0 0 35px rgba(255, 255, 255, .98);
+}
+
+
+/* ==========================================
+   LAYER PRIORITY
+   ========================================== */
+
+/*
+   BACKGROUND
+*/
+.scene::before {
+    content: "";
+
+    position: absolute;
+
+    left: 50%;
+    top: 50%;
+
+    width: 1px;
+    height: 1px;
+
+    transform:
+        translate(-50%, -50%)
+        translateZ(-100px);
+
+    z-index: 1;
+
+    pointer-events: none;
+}
+
+
+/*
+   Explicit layer ordering
+*/
+#orbit-container {
+    z-index: 50;
+}
+
+.center-circle {
+    z-index: 100;
+}
+
+.planet {
+    z-index: 120;
+}
+
+.planet.depth-back {
+    z-index: 110;
+}
+
+.planet.depth-normal {
+    z-index: 120;
+}
+
+.planet.depth-front {
+    z-index: 130;
+}
+
+.planet.depth-front-max {
+    z-index: 140;
+}
+
+.planet.selected {
     z-index: 200;
 }
 
 
 /* ==========================================
-   Z-AXIS DEPTH RULE
-========================================== */
+   Z-AXIS DEPTH VISIBILITY
+   ========================================== */
 
 .scene,
 .orbit,
 .planet,
 .center-circle {
-    transform-style: preserve-3d;
-
     backface-visibility: visible;
 }
 
 
 /* ==========================================
-   DEPTH HIERARCHY
-========================================== */
+   DEPTH INTERACTION SAFETY
+   ========================================== */
 
 /*
-   BACK
-   --------------------------------
-   Orbit       = -20px
-   Planet      = +10px
-   NITHTHU     = +30px
-   Selected    = +50px
-   --------------------------------
-   FRONT
+   Prevent orbit from blocking planets
 */
+#orbit-container,
+.orbit {
+    pointer-events: none;
+}
+
+
+/*
+   Planets remain interactive
+*/
+.planet {
+    pointer-events: auto;
+}
+
+
+/*
+   NITHTHU remains visual-only
+*/
+#niththu {
+    pointer-events: none;
+}
 
 
 /* ==========================================
    MOBILE
-========================================== */
+   ========================================== */
 
 @media (max-width: 768px) {
 
@@ -314,4 +482,25 @@ body {
     #camera {
         perspective: 800px;
     }
+
+    /*
+       Slightly smaller interaction depth
+       for mobile screens
+    */
+    .planet.depth-back {
+        --planet-depth: -25px;
+    }
+
+    .planet.depth-front {
+        --planet-depth: 25px;
+    }
+
+    .planet.depth-front-max {
+        --planet-depth: 45px;
+    }
 }
+
+
+/* ==========================================
+   ENG-004.3 END
+   ========================================== */
