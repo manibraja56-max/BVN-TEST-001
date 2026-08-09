@@ -1,13 +1,14 @@
 /* ==========================================
-BVN SMART ENGINE V1
-ENG-004.1
-LAYER SEPARATION + Z-AXIS DEPTH
-Includes ENG-003.6 Touch / Drag Rotation
+   BVN SMART ENGINE V1
+   ENG-004.2
+   INDEPENDENT LAYER DEPTH
+   Includes ENG-004.1 Layer Separation
+   Includes ENG-003.6 Touch / Drag Rotation
 ========================================== */
 
 
 /* ==========================================
-GLOBAL
+   GLOBAL
 ========================================== */
 
 * {
@@ -39,7 +40,7 @@ body {
 
 
 /* ==========================================
-LAYER 1 — CAMERA
+   LAYER 1 — CAMERA
 ========================================== */
 
 #camera {
@@ -56,7 +57,7 @@ LAYER 1 — CAMERA
 
 
 /* ==========================================
-LAYER 2 — 3D SCENE
+   LAYER 2 — 3D SCENE
 ========================================== */
 
 .scene {
@@ -80,7 +81,8 @@ LAYER 2 — 3D SCENE
 
 
 /* ==========================================
-LAYER 3 — CENTER / NITHTHU
+   LAYER 3 — CENTER / NITHTHU
+   DEPTH = +30px
 ========================================== */
 
 .center-circle {
@@ -106,8 +108,11 @@ LAYER 3 — CENTER / NITHTHU
     box-shadow:
         0 0 40px rgba(46, 204, 113, .35);
 
-    transform:
-        translateZ(0px);
+    /*
+       Independent Z depth
+       NITHTHU stays in front of orbit
+    */
+    translate: 0 0 30px;
 
     transform-style: preserve-3d;
 
@@ -116,7 +121,7 @@ LAYER 3 — CENTER / NITHTHU
 
 
 /* ==========================================
-NITHTHU IMAGE
+   NITHTHU IMAGE
 ========================================== */
 
 #niththu {
@@ -134,7 +139,8 @@ NITHTHU IMAGE
 
 
 /* ==========================================
-LAYER 4 — ORBIT SYSTEM
+   LAYER 4 — ORBIT SYSTEM
+   DEPTH = -20px
 ========================================== */
 
 #orbit-container {
@@ -150,12 +156,17 @@ LAYER 4 — ORBIT SYSTEM
 
     pointer-events: none;
 
+    /*
+       Orbit system sits behind NITHTHU
+    */
+    translate: 0 0 -20px;
+
     z-index: 50;
 }
 
 
 /* ==========================================
-ORBIT
+   ORBIT
 ========================================== */
 
 .orbit {
@@ -163,6 +174,12 @@ ORBIT
 
     left: 50%;
     top: 50%;
+
+    /*
+       ENG-004.2
+       Independent orbit depth
+    */
+    translate: 0 0 -20px;
 
     transform:
         translate(-50%, -50%);
@@ -174,11 +191,14 @@ ORBIT
     transform-style: preserve-3d;
 
     pointer-events: none;
+
+    backface-visibility: visible;
 }
 
 
 /* ==========================================
-LAYER 5 — PLANETS
+   LAYER 5 — PLANETS
+   DEPTH = +10px
 ========================================== */
 
 .planet {
@@ -188,6 +208,11 @@ LAYER 5 — PLANETS
 
     cursor: pointer;
 
+    /*
+       Independent planet depth
+    */
+    translate: 0 0 10px;
+
     transition:
         transform .25s,
         box-shadow .25s;
@@ -195,17 +220,24 @@ LAYER 5 — PLANETS
     transform-style: preserve-3d;
 
     pointer-events: auto;
+
+    backface-visibility: visible;
 }
 
 
 /* ==========================================
-PLANET HOVER
+   PLANET HOVER
+   DEPTH = +15px additional
 ========================================== */
 
 .planet:hover {
     transform:
-        scale(1.15)
-        translateZ(15px);
+        scale(1.15);
+
+    /*
+       Hover depth
+    */
+    translate: 0 0 25px;
 
     box-shadow:
         0 0 22px rgba(255, 255, 255, .8);
@@ -213,15 +245,20 @@ PLANET HOVER
 
 
 /* ==========================================
-PLANET SELECTED
+   PLANET SELECTED
+   DEPTH = +50px
 ========================================== */
 
 .planet.selected {
     outline: 3px solid white;
 
+    /*
+       Selected planet comes clearly forward
+    */
+    translate: 0 0 50px;
+
     transform:
-        scale(1.2)
-        translateZ(25px);
+        scale(1.2);
 
     box-shadow:
         0 0 30px rgba(255, 255, 255, .95);
@@ -231,19 +268,37 @@ PLANET SELECTED
 
 
 /* ==========================================
-Z-AXIS DEPTH LAYERS
+   Z-AXIS DEPTH RULE
 ========================================== */
 
 .scene,
 .orbit,
 .planet,
 .center-circle {
+    transform-style: preserve-3d;
+
     backface-visibility: visible;
 }
 
 
 /* ==========================================
-MOBILE
+   DEPTH HIERARCHY
+========================================== */
+
+/*
+   BACK
+   --------------------------------
+   Orbit       = -20px
+   Planet      = +10px
+   NITHTHU     = +30px
+   Selected    = +50px
+   --------------------------------
+   FRONT
+*/
+
+
+/* ==========================================
+   MOBILE
 ========================================== */
 
 @media (max-width: 768px) {
