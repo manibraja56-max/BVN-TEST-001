@@ -504,3 +504,120 @@ body {
 /* ==========================================
    ENG-004.3 END
    ========================================== */
+/* ==========================================
+   BVN SMART ENGINE V1
+   ENG-004.4
+   DEPTH-BASED PLANET SCALING
+
+   Includes:
+   ENG-004.1 Layer Separation + Z-Axis Depth
+   ENG-004.2 Independent Layer Depth
+   ENG-004.3 Depth Interaction / Layer Priority
+========================================== */
+
+
+/* ==========================================
+   DEPTH SCALE SYSTEM
+========================================== */
+
+.planet {
+    --depth-scale: 1;
+
+    scale: var(--depth-scale);
+}
+
+
+/* ==========================================
+   FAR DEPTH
+========================================== */
+
+.planet.depth-back {
+    --depth-scale: 0.85;
+}
+
+
+/* ==========================================
+   NORMAL DEPTH
+========================================== */
+
+.planet.depth-normal {
+    --depth-scale: 1;
+}
+
+
+/* ==========================================
+   FRONT DEPTH
+========================================== */
+
+.planet.depth-front {
+    --depth-scale: 1.10;
+}
+
+
+/* ==========================================
+   MAX FRONT DEPTH
+========================================== */
+
+.planet.depth-front-max {
+    --depth-scale: 1.20;
+}
+
+
+/* ==========================================
+   DEPTH SCALE TRANSITION
+========================================== */
+
+.planet {
+    transition:
+        transform .25s,
+        box-shadow .25s,
+        scale .25s;
+}
+
+
+/* ==========================================
+   HOVER + DEPTH
+========================================== */
+
+.planet:hover {
+    scale: var(--depth-scale);
+}
+
+
+/* ==========================================
+   SELECTED + DEPTH
+========================================== */
+
+.planet.selected {
+    scale: calc(var(--depth-scale) * 1.05);
+}
+
+
+/* ==========================================
+   MOBILE DEPTH SCALING
+========================================== */
+
+@media (max-width: 768px) {
+
+    .planet.depth-back {
+        --depth-scale: 0.90;
+    }
+
+    .planet.depth-normal {
+        --depth-scale: 1;
+    }
+
+    .planet.depth-front {
+        --depth-scale: 1.08;
+    }
+
+    .planet.depth-front-max {
+        --depth-scale: 1.15;
+    }
+
+}
+
+
+/* ==========================================
+   ENG-004.4 END
+========================================== */
