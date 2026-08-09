@@ -782,7 +782,10 @@ SELECTED PLANET
 ========================================== */
 
 .planet.selected {
-    opacity: 1;
+opacity: 1;
+box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.75),
+            0 0 18px rgba(255, 255, 255, 0.45);
+filter: brightness(1.12);
 }
 
 
