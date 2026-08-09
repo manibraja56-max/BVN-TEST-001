@@ -621,3 +621,171 @@ body {
 /* ==========================================
    ENG-004.4 END
 ========================================== */
+/* ==========================================
+BVN SMART ENGINE V1
+ENG-004.5
+DEPTH-BASED VISUAL RESPONSE
+
+Includes:
+ENG-004.1 Layer Separation + Z-Axis Depth
+ENG-004.2 Independent Layer Depth
+ENG-004.3 Depth Interaction / Layer Priority
+ENG-004.4 Depth-Based Planet Scaling
+========================================== */
+
+
+/* ==========================================
+DEPTH VISUAL BASE
+========================================== */
+
+.planet {
+    transition:
+        transform .25s ease,
+        box-shadow .25s ease,
+        opacity .25s ease,
+        filter .25s ease;
+}
+
+
+/* ==========================================
+DEPTH-BACK
+========================================== */
+
+.planet.depth-back {
+    opacity: 0.72;
+
+    filter:
+        brightness(0.78)
+        saturate(0.85);
+
+    box-shadow:
+        0 0 10px rgba(255, 255, 255, .12);
+}
+
+
+/* ==========================================
+DEPTH-MID
+========================================== */
+
+.planet.depth-mid {
+    opacity: 0.88;
+
+    filter:
+        brightness(0.92)
+        saturate(0.95);
+
+    box-shadow:
+        0 0 16px rgba(255, 255, 255, .22);
+}
+
+
+/* ==========================================
+DEPTH-FRONT
+========================================== */
+
+.planet.depth-front {
+    opacity: 1;
+
+    filter:
+        brightness(1.08)
+        saturate(1.08);
+
+    box-shadow:
+        0 0 24px rgba(255, 255, 255, .45);
+}
+
+
+/* ==========================================
+DEPTH-FRONT-MAX
+========================================== */
+
+.planet.depth-front-max {
+    opacity: 1;
+
+    filter:
+        brightness(1.15)
+        saturate(1.15);
+
+    box-shadow:
+        0 0 32px rgba(255, 255, 255, .65);
+}
+
+
+/* ==========================================
+DEPTH VISUAL END
+========================================== */
+/* ==========================================
+BVN SMART ENGINE V1
+ENG-004.6
+DEPTH-BASED OPACITY TRANSITION
+
+Includes:
+ENG-004.1 Layer Separation + Z-Axis Depth
+ENG-004.2 Independent Layer Depth
+ENG-004.3 Depth Interaction / Layer Priority
+ENG-004.4 Depth-Based Planet Scaling
+ENG-004.5 Depth-Based Visual Response
+========================================== */
+
+
+/* ==========================================
+DEPTH OPACITY BASE
+========================================== */
+
+.planet {
+    transition:
+        opacity .35s ease,
+        transform .35s ease,
+        box-shadow .35s ease,
+        filter .35s ease;
+}
+
+
+/* ==========================================
+DEPTH-BACK
+========================================== */
+
+.planet.depth-back {
+    opacity: 0.55;
+}
+
+
+/* ==========================================
+DEPTH-MID
+========================================== */
+
+.planet.depth-mid {
+    opacity: 0.78;
+}
+
+
+/* ==========================================
+DEPTH-FRONT
+========================================== */
+
+.planet.depth-front {
+    opacity: 0.92;
+}
+
+
+/* ==========================================
+DEPTH-FRONT-MAX
+========================================== */
+
+.planet.depth-front-max {
+    opacity: 1;
+}
+
+
+/* ==========================================
+SELECTED PLANET
+========================================== */
+
+.planet.selected {
+    opacity: 1;
+}
+
+
+/* ==========================================
+DEPTH OPACITY END
+========================================== */
